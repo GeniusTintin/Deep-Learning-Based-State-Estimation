@@ -41,11 +41,14 @@ state, observation = kft.sample(
 Step 2: Initialize our model
 '''
 
+# system matrix is the same
 # specify parameters
 transition_matrix = A
 transition_offset = B
 observation_matrix = C
 observation_offset = D
+
+# uncertainty matrix is different
 transition_covariance = 0.02*np.eye(3)
 observation_covariance = np.eye(1)
 initial_state_mean =[0,0,1]
@@ -72,6 +75,7 @@ smoothed_state_estimater, ns_cov = kf.smooth(observation)
 Step 3: Learn good values for parameters named in `em_vars` using the EM algorithm
 '''
 
+# diagonal matrix with trace on the diagonal
 def compute_tr(a):
     size = a.shape[0]
     return (np.trace(a)/size)*np.eye(size)
@@ -99,9 +103,9 @@ def test(data,method='TL',n_iteration=10):
         labelfilter = 'EM-KF'
         labelsmooth = 'EM-KS'
     
-    t_train = time.process_time()
-    kfem = kf.em(X=data, n_iter=n_iteration)
-    t_em = time.process_time()
+    t_train = time.process_time() # calculate the time taken while training.
+    kfem = kf.em(X=data, n_iter=n_iteration) # apply EM algorithm to estimate all parameters specified by em_vars (em_vars are defined above)
+    t_em = time.process_time() # calculate the time taken while compute the em_vars
     print('train-time/sec',t_train-t_start)
     print('em-time/sec',t_em-t_train)
     Qem = compute_tr(kfem.transition_covariance)
@@ -117,9 +121,28 @@ def test(data,method='TL',n_iteration=10):
         random_state=random_state
     )
     #obsem = kfem.sample(n_timesteps=step,initial_state=m0)[1]
-    filtered_state_estimates, f_cov = kfem.filter(observation)
-    smoothed_state_estimates, s_cov = kfem.smooth(observation)
-    return filtered_state_estimates, f_cov, smoothed_state_estimates, s_cov,labelfilter,labelsmooth
+
+    '''
+    - apply the Kalman Filter to estimate the hidden state at time t for t=[0,n-1] given observation up to and including time t.
+
+    returns:
+    - filtered_state_means
+    - filtered_state_covariances
+    '''
+    filtered_state_estimates, f_covariance = kfem.filter(observation) 
+
+
+    '''
+    - apply the Kalman Filter to estimate the hidden state at time t for t=[0,n-1] given all observations.
+
+    returns:
+    - smoothed_state_means
+    - smoothed_state_covariances
+    '''
+    smoothed_state_estimates, s_covariance = kfem.smooth(observation) 
+
+    
+    return filtered_state_estimates, f_covariance, smoothed_state_estimates, s_covariance, labelfilter,labelsmooth
 
 
 # draw estimates
@@ -139,7 +162,7 @@ smoothed_delta_estimates_tranf = smoothed_state_estimates_tranf[:,0] - state[:,0
 #smoothed_delta_estimates[step-1] = smoothed_delta_estimates[step-3]
 # lines_true = plt.plot(state[:,0],state[:,1] ,color='c',label='true')
 #lines_model = plt.plot(state, color='m')
-msefr = np.linalg.norm(filtered_delta_estimater)**2/step
+msefr = np.linalg.norm(filtered_delta_estimater)**2/step # step was defined above (step = 200)
 msesr = np.linalg.norm(smoothed_delta_estimater)**2/step
 msefs = np.linalg.norm(filtered_delta_estimates)**2/step
 msess = np.linalg.norm(smoothed_delta_estimates)**2/step
