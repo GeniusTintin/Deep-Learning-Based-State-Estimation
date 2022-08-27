@@ -22,8 +22,10 @@ B= [0, 0, 0]
 C= [1,0,0]
 D= [0]
 Q= 0.01*np.eye(3)
+# Q = 0 * np.eye(3)
 R= 0.005*np.eye(1)
-m0= [ 0,0,0.1]
+# R= 0*np.eye(1)
+m0= [0,0,0.1]
 P0= 0.1*np.eye(3)
 
 kft = KalmanFilter(
@@ -49,10 +51,10 @@ observation_matrix = C
 observation_offset = D
 
 # uncertainty matrix is different
-transition_covariance = 0.02*np.eye(3)
-observation_covariance = np.eye(1)
-initial_state_mean =[0,0,1]
-initial_state_covariance = 5*np.eye(3)
+transition_covariance = 0.02*np.eye(3) # Q
+observation_covariance = np.eye(1) # R (this is where all the uncertainty comes from)
+initial_state_mean =[0,0,1] # m0
+initial_state_covariance = 5*np.eye(3) # P0
 
 # sample from model
 
@@ -146,7 +148,8 @@ def test(data,method='TL',n_iteration=10):
 
 
 # draw estimates
-filtered_state_estimates, f_cov, smoothed_state_estimates, s_cov, labelfilter,labelsmooth = test(data[:,0],n_iteration=10)
+filtered_state_estimates, f_cov, smoothed_state_estimates, s_cov, labelfilter,labelsmooth = test(data[:,0], method = 'TL', n_iteration=10)
+# filtered_state_estimates, f_cov, smoothed_state_estimates, s_cov, labelfilter,labelsmooth = test(observation[:,0], method = 'TL', n_iteration=10)
 #print('emkf=',filtered_state_estimates[:,0].tolist())
 #print('emks=',smoothed_state_estimates[:,0].tolist())
 filtered_delta_estimater = filtered_state_estimater[:,0] - state[:,0]

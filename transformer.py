@@ -169,6 +169,7 @@ def train(datas,hidden,sample_size=1,max_len=1,attn_heads = 4,dropout = 0.1,epoc
     
     net = TransformerBlock(hidden, attn_heads, hidden * 4, dropout)
     criterion = nn.MSELoss()
+    # MSE loss: Creates a criterion that measures the mean squared error (squared L2 norm) between each element in the input x and target y.
     optimizer = torch.optim.Adam(net.parameters(),lr=0.01)
     loss_list = []
     datas = datas.reshape(sample_size, max_len, hidden)
