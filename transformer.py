@@ -185,7 +185,6 @@ def train(datas,hidden,sample_size=1,max_len=1,attn_heads = 4,dropout = 0.1,epoc
             print('Epoch: {}, Loss: {:.5f}'.format(e + 1, loss.item()))
     
     net = net.eval()
-    var_data = Variable(datas)
-    pred_test = net(var_data,mask=None)
+    pred_test = net(datas,mask=None)
     pred_test = pred_test.view(-1).data.numpy().reshape(hidden)
     return pred_test,loss_list

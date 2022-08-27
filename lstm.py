@@ -57,10 +57,8 @@ def train(datas,look_back=5,step = 200,epochtime = 100):
     optimizer = torch.optim.Adam(net.parameters(),lr=0.01)
     loss_list = []
     for e in range(epochtime):
-        var_x = Variable(train_x)
-        var_y = Variable(train_y)
-        out = net(var_x)
-        loss = criterion(out, var_y)
+        out = net(train_x)
+        loss = criterion(out, train_y)
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()

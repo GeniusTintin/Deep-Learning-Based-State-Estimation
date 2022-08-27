@@ -51,8 +51,8 @@ observation_matrix = C
 observation_offset = D
 
 # uncertainty matrix is different
-transition_covariance = 0.02*np.eye(3) # Q
-observation_covariance = np.eye(1) # R (this is where all the uncertainty comes from)
+transition_covariance = 0.02 *np.eye(3) # Q
+observation_covariance = 1 * np.eye(1) # R (this is where all the uncertainty comes from)
 initial_state_mean =[0,0,1] # m0
 initial_state_covariance = 5*np.eye(3) # P0
 
